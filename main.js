@@ -57,7 +57,7 @@ const renderCables = (cables) => {
   if (!cables || cables.length === 0) {
     catalogElement.innerHTML = `
       <p class="empty-state">
-        No hay cables o conectores disponibles.
+        No hay productos disponibles.
       </p>
     `;
     return;
@@ -69,12 +69,21 @@ const renderCables = (cables) => {
         cable.image_url ||
         'https://placehold.co/800x500?text=Sin+Imagen';
 
-      const connector = cable.connector_type
+      const sourceLink = cable.source_url
         ? `
-          <span class="tag">
-            ${escapeHtml(cable.connector_type)}
-          </span>
-        `
+            <div class="cable-info">
+              <strong>URL:</strong>
+              <p>
+                <a
+                  href="${escapeHtml(cable.source_url)}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Ver fuente
+                </a>
+              </p>
+            </div>
+          `
         : '';
 
       return `
@@ -92,39 +101,31 @@ const renderCables = (cables) => {
               <span class="tag">
                 ${escapeHtml(cable.category || 'Sin categoría')}
               </span>
-
-              ${connector}
             </div>
 
             <h3>${escapeHtml(cable.name)}</h3>
 
-            <p>
-              ${escapeHtml(
-                cable.description || 'No hay descripción disponible.'
-              )}
-            </p>
+            <div class="cable-info">
+              <strong>Marca:</strong>
+              <p>${escapeHtml(cable.brand || 'N/A')}</p>
+            </div>
 
-            ${
-              cable.purpose
-                ? `
-                  <div class="cable-info">
-                    <strong>Propósito:</strong>
-                    <p>${escapeHtml(cable.purpose)}</p>
-                  </div>
-                `
-                : ''
-            }
+            <div class="cable-info">
+              <strong>Capacidad:</strong>
+              <p>${escapeHtml(cable.capacity || 'N/A')}</p>
+            </div>
 
-            ${
-              cable.features
-                ? `
-                  <div class="cable-info">
-                    <strong>Características:</strong>
-                    <p>${escapeHtml(cable.features)}</p>
-                  </div>
-                `
-                : ''
-            }
+            <div class="cable-info">
+              <strong>Modelo:</strong>
+              <p>${escapeHtml(cable.model || 'N/A')}</p>
+            </div>
+
+            <div class="cable-info">
+              <strong>Especificación:</strong>
+              <p>${escapeHtml(cable.specification || 'N/A')}</p>
+            </div>
+
+            ${sourceLink}
 
           </div>
 
@@ -150,13 +151,13 @@ const filterCatalog = () => {
 
   const filtered = allCables.filter((cable) => {
     const searchableText = `
-      ${cable.name || ''}
-      ${cable.category || ''}
-      ${cable.connector_type || ''}
-      ${cable.description || ''}
-      ${cable.purpose || ''}
-      ${cable.features || ''}
-    `.toLowerCase();
+  ${cable.name || ''}
+  ${cable.category || ''}
+  ${cable.brand || ''}
+  ${cable.capacity || ''}
+  ${cable.model || ''}
+  ${cable.specification || ''}
+`.toLowerCase();
 
     const matchesSearch =
       !search || searchableText.includes(search);
@@ -250,14 +251,10 @@ const loadCatalog = async () => {
 const validateCableForm = (formData) => {
   const name = formData.get('name')?.trim();
   const category = formData.get('category')?.trim();
-  const description = formData.get('description')?.trim();
-  const purpose = formData.get('purpose')?.trim();
 
   return Boolean(
     name &&
-    category &&
-    description &&
-    purpose
+    category
   );
 };
 
@@ -282,38 +279,44 @@ const handleCableSubmit = async (event) => {
     return;
   }
 
-  const cable = {
-    name: formData.get('name').trim(),
+ const cable = {
+  name: formData.get('name').trim(),
 
-    category: formData
+  category:
+    formData
       .get('category')
       .trim(),
 
-    connector_type:
-      formData
-        .get('connector_type')
-        ?.trim() || null,
+  brand:
+    formData
+      .get('brand')
+      ?.trim() || null,
 
-    description:
-      formData
-        .get('description')
-        .trim(),
+  capacity:
+    formData
+      .get('capacity')
+      ?.trim() || null,
 
-    purpose:
-      formData
-        .get('purpose')
-        .trim(),
+  model:
+    formData
+      .get('model')
+      ?.trim() || null,
 
-    features:
-      formData
-        .get('features')
-        ?.trim() || null,
+  specification:
+    formData
+      .get('specification')
+      ?.trim() || null,
 
-    image_url:
-      formData
-        .get('image_url')
-        ?.trim() || null
-  };
+  image_url:
+    formData
+      .get('image_url')
+      ?.trim() || null,
+
+  source_url:
+    formData
+      .get('source_url')
+      ?.trim() || null
+};
 
   setStatus('Guardando elemento...', '');
 
@@ -365,52 +368,56 @@ const normalizeBulkField = (key) => {
   ) {
     return 'category';
   }
+if (
+  normalized === 'brand' ||
+  normalized === 'marca'
+) {
+  return 'brand';
+}
 
-  if (
-    normalized === 'connector type' ||
-    normalized === 'connector_type' ||
-    normalized === 'connector'
-  ) {
-    return 'connector_type';
-  }
+if (
+  normalized === 'capacity' ||
+  normalized === 'capacidad' ||
+  normalized === 'cap'
+) {
+  return 'capacity';
+}
 
-  if (
-    normalized === 'description' ||
-    normalized === 'descripcion' ||
-    normalized === 'descripción'
-  ) {
-    return 'description';
-  }
+if (
+  normalized === 'model' ||
+  normalized === 'modelo'
+) {
+  return 'model';
+}
 
-  if (
-    normalized === 'purpose' ||
-    normalized === 'proposito' ||
-    normalized === 'propósito'
-  ) {
-    return 'purpose';
-  }
+if (
+  normalized === 'specification' ||
+  normalized === 'spec' ||
+  normalized === 'especificacion' ||
+  normalized === 'especificación'
+) {
+  return 'specification';
+}
 
-  if (
-    normalized === 'features' ||
-    normalized === 'characteristics' ||
-    normalized === 'caracteristicas' ||
-    normalized === 'características'
-  ) {
-    return 'features';
-  }
+if (
+  normalized === 'image url' ||
+  normalized === 'image_url' ||
+  normalized === 'image' ||
+  normalized === 'imagen'
+) {
+  return 'image_url';
+}
 
-  if (
-    normalized === 'image url' ||
-    normalized === 'image_url' ||
-    normalized === 'image' ||
-    normalized === 'imagen'
-  ) {
-    return 'image_url';
-  }
-
-  return null;
+if (
+  normalized === 'source url' ||
+  normalized === 'source_url' ||
+  normalized === 'url' ||
+  normalized === 'fuente'
+) {
+  return 'source_url';
+}
+return null;
 };
-
 
 /* =========================================================
    PARSE BULK CABLES
@@ -463,26 +470,15 @@ const parseBulkCables = (text) => {
       );
     }
 
-    if (!cable.description) {
-      errors.push(
-        `Entrada ${index + 1}: falta Description.`
-      );
-    }
+    cable.brand = cable.brand || null;
+cable.capacity = cable.capacity || null;
+cable.model = cable.model || null;
+cable.specification = cable.specification || null;
+cable.image_url = cable.image_url || null;
+cable.source_url = cable.source_url || null;
 
-    if (!cable.purpose) {
-      errors.push(
-        `Entrada ${index + 1}: falta Purpose.`
-      );
-    }
-
-    cable.connector_type =
-      cable.connector_type || null;
-
-    cable.features =
-      cable.features || null;
-
-    cable.image_url =
-      cable.image_url || null;
+cable.description = 'N/A';
+cable.purpose = 'N/A';
 
     cables.push(cable);
   });

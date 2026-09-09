@@ -10,11 +10,12 @@ export const fetchCables = async ({ page = 1, pageSize = 50 } = {}) => {
       id,
       name,
       category,
-      connector_type,
-      description,
-      purpose,
-      features,
+      brand,
+      capacity,
+      model,
+      specification,
       image_url,
+      source_url,
       created_at
     `)
     .order('name', { ascending: true })
@@ -53,11 +54,16 @@ export const createCable = async (cable) => {
     .insert({
       name: cable.name,
       category: cable.category,
-      connector_type: cable.connector_type || null,
-      description: cable.description,
-      purpose: cable.purpose,
-      features: cable.features || null,
-      image_url: cable.image_url || null
+      brand: cable.brand || null,
+      capacity: cable.capacity || null,
+      model: cable.model || null,
+      specification: cable.specification || null,
+      image_url: cable.image_url || null,
+      source_url: cable.source_url || null,
+
+      // Temporales mientras la tabla todavía exige estos campos.
+      description: cable.description || 'N/A',
+      purpose: cable.purpose || 'N/A'
     })
     .select()
     .single();
@@ -71,11 +77,16 @@ export const updateCable = async (id, cable) => {
     .update({
       name: cable.name,
       category: cable.category,
-      connector_type: cable.connector_type || null,
-      description: cable.description,
-      purpose: cable.purpose,
-      features: cable.features || null,
-      image_url: cable.image_url || null
+      brand: cable.brand || null,
+      capacity: cable.capacity || null,
+      model: cable.model || null,
+      specification: cable.specification || null,
+      image_url: cable.image_url || null,
+      source_url: cable.source_url || null,
+
+      // Temporales mientras la tabla todavía exige estos campos.
+      description: cable.description || 'N/A',
+      purpose: cable.purpose || 'N/A'
     })
     .eq('id', id)
     .select()

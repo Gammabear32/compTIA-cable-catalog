@@ -139,132 +139,145 @@
 
       <section class="panel">
 
-        <h2>Añadir un cable o conector</h2>
+        <h2>Añadir producto al catálogo</h2>
 
-        <form id="cable-form">
+<form id="cable-form">
 
+  <div class="field-row">
 
-          <div class="field-row">
+    <label for="name">
+      Nombre
+    </label>
 
-            <label for="name">
-              Nombre
-            </label>
+    <input
+      id="name"
+      name="name"
+      type="text"
+      placeholder="Ej. SanDisk Ultra Flair"
+      required
+    />
 
-            <input
-              id="name"
-              name="name"
-              type="text"
-              placeholder="Ej. HDMI"
-              required
-            />
-
-          </div>
-
-
-          <div class="field-row">
-
-            <label for="category">
-              Categoría
-            </label>
-
-            <input
-              id="category"
-              name="category"
-              type="text"
-              placeholder="Ej. Video Cable"
-              required
-            />
-
-          </div>
+  </div>
 
 
-          <div class="field-row">
+  <div class="field-row">
 
-            <label for="connector_type">
-              Tipo de conector
-            </label>
+    <label for="category">
+      Categoría
+    </label>
 
-            <input
-              id="connector_type"
-              name="connector_type"
-              type="text"
-              placeholder="Ej. HDMI, RJ45, USB-C"
-            />
+    <input
+      id="category"
+      name="category"
+      type="text"
+      placeholder="Ej. USB Drive"
+      required
+    />
 
-          </div>
-
-
-          <div class="field-row full-width">
-
-            <label for="description">
-              Descripción
-            </label>
-
-            <textarea
-              id="description"
-              name="description"
-              rows="3"
-              placeholder="Descripción breve del cable, conector o estándar."
-              required
-            ></textarea>
-
-          </div>
+  </div>
 
 
-          <div class="field-row full-width">
+  <div class="field-row">
 
-            <label for="purpose">
-              Propósito
-            </label>
+    <label for="brand">
+      Marca
+    </label>
 
-            <textarea
-              id="purpose"
-              name="purpose"
-              rows="3"
-              placeholder="¿Para qué se utiliza?"
-              required
-            ></textarea>
+    <input
+      id="brand"
+      name="brand"
+      type="text"
+      placeholder="Ej. SanDisk"
+    />
 
-          </div>
-
-
-          <div class="field-row full-width">
-
-            <label for="features">
-              Características
-            </label>
-
-            <textarea
-              id="features"
-              name="features"
-              rows="3"
-              placeholder="Características principales."
-            ></textarea>
-
-          </div>
+  </div>
 
 
-          <div class="field-row full-width">
+  <div class="field-row">
 
-            <label for="image_url">
-              URL de imagen
-            </label>
+    <label for="capacity">
+      Capacidad
+    </label>
 
-            <input
-              id="image_url"
-              name="image_url"
-              type="url"
-              placeholder="https://example.com/image.jpg"
-            />
+    <input
+      id="capacity"
+      name="capacity"
+      type="text"
+      placeholder="Ej. 64 GB"
+    />
 
-          </div>
+  </div>
 
 
-          <button type="submit">
-            Añadir al catálogo
-          </button>
+  <div class="field-row">
 
-        </form>
+    <label for="model">
+      Modelo
+    </label>
+
+    <input
+      id="model"
+      name="model"
+      type="text"
+      placeholder="Ej. Ultra Flair"
+    />
+
+  </div>
+
+
+  <div class="field-row">
+
+    <label for="specification">
+      Especificación
+    </label>
+
+    <input
+      id="specification"
+      name="specification"
+      type="text"
+      placeholder="Ej. USB 3.1"
+    />
+
+  </div>
+
+
+  <div class="field-row full-width">
+
+    <label for="image_url">
+      URL de imagen
+    </label>
+
+    <input
+      id="image_url"
+      name="image_url"
+      type="text"
+      placeholder="images/usb-drive.jpg o https://..."
+    />
+
+  </div>
+
+
+  <div class="field-row full-width">
+
+    <label for="source_url">
+      URL de fuente
+    </label>
+
+    <input
+      id="source_url"
+      name="source_url"
+      type="url"
+      placeholder="https://..."
+    />
+
+  </div>
+
+
+  <button type="submit">
+    Añadir al catálogo
+  </button>
+
+</form>
 
       </section>
 
@@ -278,30 +291,32 @@
         <h2>Importar varios elementos</h2>
 
         <p>
-          Puedes añadir varios cables o conectores de una sola vez.
+          Puedes añadir varios productos de una sola vez.
           Separa cada registro utilizando una línea con un asterisco (*).
         </p>
 
 
         <textarea
-          id="bulk-input"
-          rows="16"
-          placeholder="Name: HDMI
-Category: Video Cable
-Connector Type: HDMI
-Description: Interfaz digital para transmitir audio y video.
-Purpose: Conectar computadoras, monitores y televisores.
-Features: Transmite audio y video digital mediante un solo cable.
-Image URL: https://example.com/hdmi.jpg
+  id="bulk-input"
+  rows="16"
+  placeholder="Name: SanDisk Ultra Flair
+Category: USB Drive
+Marca: SanDisk
+Cap: 64 GB
+Modelo: Ultra Flair
+Spec: USB 3.0
+Imagen: images/usb-drive.jpg
+URL: https://example.com/producto
 *
-Name: RJ45
-Category: Connector
-Connector Type: RJ45
-Description: Conector utilizado principalmente en redes Ethernet.
-Purpose: Conectar dispositivos a redes cableadas.
-Features: Utilizado normalmente con cables de par trenzado.
-Image URL: https://example.com/rj45.jpg"
-        ></textarea>
+Name: Cable Ethernet Cat 6
+Category: Ethernet Cable
+Marca: Cable Matters
+Cap: N/A
+Modelo: Cat6-10ft
+Spec: Cat 6
+Imagen: images/ethernet-cat6.jpg
+URL: https://example.com/producto"
+></textarea>
 
 
         <button
@@ -313,9 +328,7 @@ Image URL: https://example.com/rj45.jpg"
 
 
         <p class="bulk-help">
-          Campos soportados:
-          Name, Category, Connector Type, Description,
-          Purpose, Features e Image URL.
+          Campos soportados: Name, Category, Marca, Cap, Modelo, Spec, Imagen y URL.
         </p>
 
       </section>
