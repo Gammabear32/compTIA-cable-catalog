@@ -21,7 +21,65 @@
         utilizando Supabase.
       </p>
     </header>
+<!-- =====================================================
+     ADMIN LOGIN
+====================================================== -->
 
+<section class="panel" id="auth-panel">
+
+  <h2>Acceso de administrador</h2>
+
+  <form id="login-form">
+
+    <div class="field-row">
+
+      <label for="login-email">
+        Email
+      </label>
+
+      <input
+        id="login-email"
+        type="email"
+        placeholder="Email de administrador"
+        required
+      />
+
+    </div>
+
+    <div class="field-row">
+
+      <label for="login-password">
+        Contraseña
+      </label>
+
+      <input
+        id="login-password"
+        type="password"
+        placeholder="Contraseña"
+        required
+      />
+
+    </div>
+
+    <button type="submit">
+      Iniciar sesión
+    </button>
+
+  </form>
+
+  <button
+    id="logout-button"
+    type="button"
+    hidden
+  >
+    Cerrar sesión
+  </button>
+
+  <p id="auth-status">
+    Catálogo público. Inicia sesión para administrar productos.
+  </p>
+
+</section>
 
     <!-- =====================================================
          TABS
@@ -38,12 +96,14 @@
       </button>
 
       <button
-        class="tab-button"
-        data-tab="add-tab"
-        type="button"
-      >
-        Agregar Cable
-      </button>
+  id="admin-tab-button"
+  class="tab-button"
+  data-tab="add-tab"
+  type="button"
+  hidden
+>
+  Agregar Producto
+</button>
 
     </nav>
 
@@ -251,7 +311,7 @@
       id="image_url"
       name="image_url"
       type="text"
-      placeholder="images/usb-drive.jpg o https://..."
+      placeholder="https://..."
     />
 
   </div>
@@ -305,8 +365,8 @@ Marca: SanDisk
 Cap: 64 GB
 Modelo: Ultra Flair
 Spec: USB 3.0
-Imagen: images/usb-drive.jpg
-URL: https://example.com/producto
+Imagen: https://www.fabricante.com/imagen-del-producto.jpg
+URL: https://www.fabricante.com/producto
 *
 Name: Cable Ethernet Cat 6
 Category: Ethernet Cable
@@ -314,18 +374,16 @@ Marca: Cable Matters
 Cap: N/A
 Modelo: Cat6-10ft
 Spec: Cat 6
-Imagen: images/ethernet-cat6.jpg
-URL: https://example.com/producto"
+Imagen: https://www.fabricante.com/imagen-del-producto.jpg
+URL: https://www.fabricante.com/producto"
 ></textarea>
 
-
-        <button
-          id="bulk-import-button"
-          type="button"
-        >
-          Importar elementos
-        </button>
-
+<button
+  id="bulk-import-button"
+  type="button"
+>
+  Importar elementos
+</button>
 
         <p class="bulk-help">
           Campos soportados: Name, Category, Marca, Cap, Modelo, Spec, Imagen y URL.

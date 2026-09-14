@@ -2,7 +2,8 @@ import { supabase } from './supabaseClient.js';
 import {
   fetchCables,
   fetchCableCategories,
-  createCable
+  createCable,
+  deleteCable
 } from './db.js';
 
 const catalogElement = document.getElementById('catalog');
@@ -16,8 +17,194 @@ const bulkImportButton = document.getElementById('bulk-import-button');
 const searchInput = document.getElementById('search-input');
 const categoryFilter = document.getElementById('category-filter');
 
-let allCables = [];
+// =====================================================
+// ADMIN AUTH
+// =====================================================
 
+const loginForm = document.getElementById('login-form');
+const loginEmail = document.getElementById('login-email');
+const loginPassword = document.getElementById('login-password');
+const logoutButton = document.getElementById('logout-button');
+const authStatus = document.getElementById('auth-status');
+const adminTabButton = document.getElementById('admin-tab-button');
+
+const ADMIN_EMAIL = 'tvmk@gmail.com';
+
+let currentUser = null;
+let isAdmin = false;
+
+let allCables = [];
+/* =========================================================
+   AUTHENTICATION
+========================================================= */
+
+const updateAuthUI = () => {
+  if (loginForm) {
+    loginForm.hidden = isAdmin;
+  }
+
+  if (logoutButton) {
+    logoutButton.hidden = !isAdmin;
+  }
+
+  if (adminTabButton) {
+    adminTabButton.hidden = !isAdmin;
+  }
+
+  if (authStatus) {
+    if (isAdmin && currentUser) {
+      authStatus.textContent =
+        `Sesión iniciada como ${currentUser.email}. Acceso de administrador concedido.`;
+    } else {
+      authStatus.textContent =
+        'Catálogo público. Inicia sesión para administrar productos.';
+    }
+  }
+
+  renderCables(allCables);
+};
+
+
+const checkSession = async () => {
+  const {
+    data: { session },
+    error
+  } = await supabase.auth.getSession();
+
+  if (error) {
+    console.error('Error checking session:', error);
+    return;
+  }
+
+  currentUser = session?.user || null;
+
+  isAdmin =
+    currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
+  updateAuthUI();
+};
+
+
+const handleLogin = async (event) => {
+  event.preventDefault();
+
+  const email = loginEmail?.value.trim();
+  const password = loginPassword?.value;
+
+  if (!email || !password) {
+    setStatus(
+      'Escribe el email y la contraseña.',
+      'error'
+    );
+    return;
+  }
+
+  setStatus('Iniciando sesión...', '');
+
+  const { data, error } =
+    await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if (error) {
+    console.error(error);
+
+    setStatus(
+      'No se pudo iniciar sesión. Verifica el email y la contraseña.',
+      'error'
+    );
+
+    return;
+  }
+
+  currentUser = data.user;
+
+  isAdmin =
+    currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
+  if (!isAdmin) {
+    await supabase.auth.signOut();
+
+    currentUser = null;
+
+    setStatus(
+      'Esta cuenta no tiene permisos de administrador.',
+      'error'
+    );
+
+    updateAuthUI();
+    return;
+  }
+
+  if (loginForm) {
+    loginForm.reset();
+  }
+
+  updateAuthUI();
+
+  setStatus(
+    'Sesión de administrador iniciada correctamente.',
+    'success'
+  );
+};
+
+
+const handleLogout = async () => {
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    console.error(error);
+
+    setStatus(
+      'No se pudo cerrar la sesión.',
+      'error'
+    );
+
+    return;
+  }
+
+  currentUser = null;
+  isAdmin = false;
+
+  updateAuthUI();
+
+  const catalogTabButton =
+    document.querySelector('[data-tab="catalog-tab"]');
+
+  const catalogTab =
+    document.getElementById('catalog-tab');
+
+  const addTab =
+    document.getElementById('add-tab');
+
+  if (catalogTabButton) {
+    document.querySelectorAll('.tab-button')
+      .forEach((button) => {
+        button.classList.remove('active');
+      });
+
+    catalogTabButton.classList.add('active');
+  }
+
+  if (catalogTab) {
+    document.querySelectorAll('.tab-content')
+      .forEach((content) => {
+        content.classList.remove('active');
+      });
+
+    catalogTab.classList.add('active');
+  }
+
+  if (addTab) {
+    addTab.classList.remove('active');
+  }
+
+  setStatus(
+    'Sesión cerrada. El catálogo continúa disponible públicamente.',
+    'success'
+  );
+};
 
 /* =========================================================
    STATUS
@@ -127,7 +314,18 @@ const renderCables = (cables) => {
 
             ${sourceLink}
 
-          </div>
+${isAdmin ? `
+  <button
+    class="delete-product-button"
+    data-id="${cable.id}"
+    data-name="${escapeHtml(cable.name)}"
+    type="button"
+  >
+    Eliminar producto
+  </button>
+` : ''}
+
+</div>
 
         </article>
       `;
@@ -135,6 +333,42 @@ const renderCables = (cables) => {
     .join('');
 };
 
+/* =========================================================
+   DELETE PRODUCT
+========================================================= */
+
+const handleDeleteProduct = async (id, name) => {
+  const confirmed = window.confirm(
+    `¿Seguro que deseas eliminar "${name}"?`
+  );
+
+  if (!confirmed) return;
+
+  setStatus(`Eliminando ${name}...`, '');
+
+  try {
+    const { error } = await deleteCable(id);
+
+    if (error) {
+      throw error;
+    }
+
+    await loadCatalog();
+    await loadCategories();
+
+    setStatus(
+      `${name} fue eliminado correctamente.`,
+      'success'
+    );
+  } catch (error) {
+    console.error(error);
+
+    setStatus(
+      'No se pudo eliminar el producto. Verifica Supabase y los permisos RLS.',
+      'error'
+    );
+  }
+};
 
 /* =========================================================
    SEARCH AND FILTER
@@ -172,7 +406,6 @@ const filterCatalog = () => {
   renderCables(filtered);
 };
 
-
 /* =========================================================
    LOAD CATEGORIES
 ========================================================= */
@@ -200,7 +433,6 @@ const loadCategories = async () => {
     categoryFilter.appendChild(option);
   });
 };
-
 
 /* =========================================================
    LOAD CATALOG
@@ -608,6 +840,31 @@ const subscribeToCatalog = () => {
 /* =========================================================
    EVENT LISTENERS
 ========================================================= */
+if (loginForm) {
+  loginForm.addEventListener(
+    'submit',
+    handleLogin
+  );
+}
+
+if (logoutButton) {
+  logoutButton.addEventListener(
+    'click',
+    handleLogout
+  );
+}
+if (catalogElement) {
+  catalogElement.addEventListener('click', async (event) => {
+    const deleteButton = event.target.closest('.delete-product-button');
+
+    if (!deleteButton) return;
+
+    const id = deleteButton.dataset.id;
+    const name = deleteButton.dataset.name;
+
+    await handleDeleteProduct(id, name);
+  });
+}
 
 if (cableForm) {
   cableForm.addEventListener(
@@ -645,12 +902,33 @@ if (categoryFilter) {
 window.addEventListener(
   'DOMContentLoaded',
   async () => {
+    await checkSession();
     await loadCategories();
     await loadCatalog();
 
     subscribeToCatalog();
   }
 );
+window.addEventListener(
+  'DOMContentLoaded',
+  async () => {
+    await checkSession();
+    await loadCategories();
+    await loadCatalog();
+
+    subscribeToCatalog();
+  }
+);
+
+supabase.auth.onAuthStateChange((_event, session) => {
+  currentUser = session?.user || null;
+
+  isAdmin =
+    currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
+  updateAuthUI();
+});
+
 // =====================================================
 // TABS
 // =====================================================
