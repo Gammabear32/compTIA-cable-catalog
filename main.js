@@ -589,9 +589,12 @@ const normalizeBulkField = (key) => {
     .toLowerCase()
     .replace(/\s+/g, ' ');
 
-  if (normalized === 'name') {
-    return 'name';
-  }
+  if (
+  normalized === 'name' ||
+  normalized === 'nombre'
+) {
+  return 'name';
+}
 
   if (
     normalized === 'category' ||
@@ -709,8 +712,6 @@ cable.specification = cable.specification || null;
 cable.image_url = cable.image_url || null;
 cable.source_url = cable.source_url || null;
 
-cable.description = 'N/A';
-cable.purpose = 'N/A';
 
     cables.push(cable);
   });

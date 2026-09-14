@@ -59,11 +59,7 @@ export const createCable = async (cable) => {
       model: cable.model || null,
       specification: cable.specification || null,
       image_url: cable.image_url || null,
-      source_url: cable.source_url || null,
-
-      // Temporales mientras la tabla todavía exige estos campos.
-      description: cable.description || 'N/A',
-      purpose: cable.purpose || 'N/A'
+      source_url: cable.source_url || null
     })
     .select()
     .single();
@@ -82,11 +78,7 @@ export const updateCable = async (id, cable) => {
       model: cable.model || null,
       specification: cable.specification || null,
       image_url: cable.image_url || null,
-      source_url: cable.source_url || null,
-
-      // Temporales mientras la tabla todavía exige estos campos.
-      description: cable.description || 'N/A',
-      purpose: cable.purpose || 'N/A'
+      source_url: cable.source_url || null
     })
     .eq('id', id)
     .select()
