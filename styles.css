@@ -471,8 +471,3 @@ body::after {
   filter: none !important;
 }
 
-@media (hover: none) {
-  .image-preview {
-    display: none;
-  }
-}
