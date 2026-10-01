@@ -277,9 +277,11 @@ const renderCables = (cables) => {
         <article class="card">
 
           <img
+            class="catalog-product-image"
             src="${escapeHtml(image)}"
             alt="${escapeHtml(cable.name)}"
             loading="lazy"
+            tabindex="0"
           />
 
           <div class="card-body">
@@ -852,6 +854,54 @@ const subscribeToCatalog = () => {
   return channel;
 };
 
+
+/* =========================================================
+   IMAGE PREVIEW
+========================================================= */
+
+const imagePreview = document.createElement('div');
+imagePreview.className = 'image-preview';
+imagePreview.setAttribute('aria-hidden', 'true');
+imagePreview.innerHTML = '<img alt="" />';
+document.body.appendChild(imagePreview);
+
+const previewImage = imagePreview.querySelector('img');
+
+const showImagePreview = (image) => {
+  if (!image || !previewImage) return;
+
+  previewImage.src = image.currentSrc || image.src;
+  previewImage.alt = image.alt || 'Vista ampliada del producto';
+  imagePreview.classList.add('visible');
+  imagePreview.setAttribute('aria-hidden', 'false');
+};
+
+const hideImagePreview = () => {
+  imagePreview.classList.remove('visible');
+  imagePreview.setAttribute('aria-hidden', 'true');
+};
+
+if (catalogElement) {
+  catalogElement.addEventListener('mouseover', (event) => {
+    const image = event.target.closest('.catalog-product-image');
+    if (image) showImagePreview(image);
+  });
+
+  catalogElement.addEventListener('mouseout', (event) => {
+    const image = event.target.closest('.catalog-product-image');
+    if (image) hideImagePreview();
+  });
+
+  catalogElement.addEventListener('focusin', (event) => {
+    const image = event.target.closest('.catalog-product-image');
+    if (image) showImagePreview(image);
+  });
+
+  catalogElement.addEventListener('focusout', (event) => {
+    const image = event.target.closest('.catalog-product-image');
+    if (image) hideImagePreview();
+  });
+}
 
 /* =========================================================
    EVENT LISTENERS
