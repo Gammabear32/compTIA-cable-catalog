@@ -880,11 +880,8 @@ const positionImagePreview = (image) => {
     left = rect.left - previewWidth - gap;
   }
 
-  if (left < margin) {
-    left = Math.max(
-      margin,
-      (window.innerWidth - previewWidth) / 2
-    );
+  if (left < margin || window.innerWidth < 800) {
+    left = Math.max(margin, (window.innerWidth - previewWidth) / 2);
   }
 
   let top = rect.top + (rect.height / 2) - (previewHeight / 2);
@@ -915,31 +912,45 @@ const showImagePreview = (image) => {
 const hideImagePreview = () => {
   imagePreview.classList.remove('visible');
   imagePreview.setAttribute('aria-hidden', 'true');
+  imagePreview.style.removeProperty('display');
+  imagePreview.style.removeProperty('opacity');
+  imagePreview.style.removeProperty('visibility');
 };
 
 if (catalogElement) {
-  catalogElement.addEventListener('mouseover', (event) => {
+  catalogElement.addEventListener('click', (event) => {
     const image = event.target.closest('.catalog-product-image');
-    if (image) showImagePreview(image);
+    if (!image) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    showImagePreview(image);
   });
 
-  catalogElement.addEventListener('mouseout', (event) => {
+  catalogElement.addEventListener('keydown', (event) => {
     const image = event.target.closest('.catalog-product-image');
-    if (image) hideImagePreview();
-  });
+    if (!image || (event.key !== 'Enter' && event.key !== ' ')) return;
 
-  catalogElement.addEventListener('focusin', (event) => {
-    const image = event.target.closest('.catalog-product-image');
-    if (image) showImagePreview(image);
-  });
-
-  catalogElement.addEventListener('focusout', (event) => {
-    const image = event.target.closest('.catalog-product-image');
-    if (image) hideImagePreview();
+    event.preventDefault();
+    showImagePreview(image);
   });
 }
 
-window.addEventListener('scroll', hideImagePreview, true);
+document.addEventListener('click', (event) => {
+  if (
+    imagePreview.classList.contains('visible') &&
+    !event.target.closest('.catalog-product-image')
+  ) {
+    hideImagePreview();
+  }
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    hideImagePreview();
+  }
+});
+
 window.addEventListener('resize', hideImagePreview);
 
 /* =========================================================
