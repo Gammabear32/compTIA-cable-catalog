@@ -871,8 +871,8 @@ const positionImagePreview = (image) => {
   const rect = image.getBoundingClientRect();
   const gap = 18;
   const margin = 16;
-  const previewWidth = Math.min(560, window.innerWidth * 0.46);
-  const previewHeight = Math.min(620, window.innerHeight * 0.82);
+  const previewWidth = Math.min(520, window.innerWidth - (margin * 2));
+  const previewHeight = Math.min(560, window.innerHeight - (margin * 2));
 
   let left = rect.right + gap;
 
@@ -893,10 +893,13 @@ const positionImagePreview = (image) => {
     Math.min(top, window.innerHeight - previewHeight - margin)
   );
 
-  imagePreview.style.left = `${left}px`;
-  imagePreview.style.top = `${top}px`;
-  imagePreview.style.width = `${previewWidth}px`;
-  imagePreview.style.height = `${previewHeight}px`;
+  imagePreview.style.setProperty('left', `${left}px`, 'important');
+  imagePreview.style.setProperty('top', `${top}px`, 'important');
+  imagePreview.style.setProperty('width', `${previewWidth}px`, 'important');
+  imagePreview.style.setProperty('height', `${previewHeight}px`, 'important');
+  imagePreview.style.setProperty('display', 'flex', 'important');
+  imagePreview.style.setProperty('opacity', '1', 'important');
+  imagePreview.style.setProperty('visibility', 'visible', 'important');
 };
 
 const showImagePreview = (image) => {
