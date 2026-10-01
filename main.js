@@ -441,31 +441,46 @@ const loadCategories = async () => {
 const loadCatalog = async () => {
   setStatus('Cargando catálogo...', '');
 
-  const { data, error } = await fetchCables({
-    page: 1,
-    pageSize: 100
-  });
+  const pageSize = 100;
+  let page = 1;
+  let catalogData = [];
 
-  if (error) {
-    console.error(error);
+  while (true) {
+    const { data, error } = await fetchCables({
+      page,
+      pageSize
+    });
 
-    setStatus(
-      'No se pudo cargar el catálogo. Verifica la conexión con Supabase.',
-      'error'
-    );
+    if (error) {
+      console.error(error);
 
-    if (catalogElement) {
-      catalogElement.innerHTML = `
-        <p class="empty-state">
-          No se pudo cargar el catálogo.
-        </p>
-      `;
+      setStatus(
+        'No se pudo cargar el catálogo. Verifica la conexión con Supabase.',
+        'error'
+      );
+
+      if (catalogElement) {
+        catalogElement.innerHTML = `
+          <p class="empty-state">
+            No se pudo cargar el catálogo.
+          </p>
+        `;
+      }
+
+      return;
     }
 
-    return;
+    const batch = data || [];
+    catalogData.push(...batch);
+
+    if (batch.length < pageSize) {
+      break;
+    }
+
+    page += 1;
   }
 
-  allCables = data || [];
+  allCables = catalogData;
 
   filterCatalog();
 
