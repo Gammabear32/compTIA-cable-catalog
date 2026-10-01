@@ -867,11 +867,44 @@ document.body.appendChild(imagePreview);
 
 const previewImage = imagePreview.querySelector('img');
 
+const positionImagePreview = (image) => {
+  const rect = image.getBoundingClientRect();
+  const gap = 18;
+  const margin = 16;
+  const previewWidth = Math.min(560, window.innerWidth * 0.46);
+  const previewHeight = Math.min(620, window.innerHeight * 0.82);
+
+  let left = rect.right + gap;
+
+  if (left + previewWidth > window.innerWidth - margin) {
+    left = rect.left - previewWidth - gap;
+  }
+
+  if (left < margin) {
+    left = Math.max(
+      margin,
+      (window.innerWidth - previewWidth) / 2
+    );
+  }
+
+  let top = rect.top + (rect.height / 2) - (previewHeight / 2);
+  top = Math.max(
+    margin,
+    Math.min(top, window.innerHeight - previewHeight - margin)
+  );
+
+  imagePreview.style.left = `${left}px`;
+  imagePreview.style.top = `${top}px`;
+  imagePreview.style.width = `${previewWidth}px`;
+  imagePreview.style.height = `${previewHeight}px`;
+};
+
 const showImagePreview = (image) => {
   if (!image || !previewImage) return;
 
   previewImage.src = image.currentSrc || image.src;
   previewImage.alt = image.alt || 'Vista ampliada del producto';
+  positionImagePreview(image);
   imagePreview.classList.add('visible');
   imagePreview.setAttribute('aria-hidden', 'false');
 };
@@ -902,6 +935,9 @@ if (catalogElement) {
     if (image) hideImagePreview();
   });
 }
+
+window.addEventListener('scroll', hideImagePreview, true);
+window.addEventListener('resize', hideImagePreview);
 
 /* =========================================================
    EVENT LISTENERS
